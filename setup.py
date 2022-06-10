@@ -5,9 +5,13 @@ with open('README.md', 'r') as readme_file:
 
 requirements = []
 
+with open('requirements.txt', 'r') as dep_file:
+  dependencies = dep_file.readlines()
+  requirements = [dep for dep in dependencies]
+
 setup(
   name='ailabs-asr',
-  version='0.0.4',
+  version='0.0.5',
   author='Hendryboyz',
   author_email="Hendry.js1247@gmail.com",
   description="Package to utilize the speech to text API powered by AILabs.tw",
