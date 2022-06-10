@@ -3,15 +3,9 @@ from setuptools import setup, find_packages
 with open('README.md', 'r') as readme_file:
   readme = readme_file.read()
 
-requirements = []
-
-with open('requirements.txt', 'r') as dep_file:
-  dependencies = dep_file.readlines()
-  requirements = [dep for dep in dependencies]
-
 setup(
   name='ailabs-asr',
-  version='0.0.5',
+  version='0.0.8',
   author='Hendryboyz',
   author_email="Hendry.js1247@gmail.com",
   description="Package to utilize the speech to text API powered by AILabs.tw",
@@ -21,7 +15,12 @@ setup(
   packages=find_packages(),
   include_package_data=True,
   package_data={'ailabs_asr': ['configs/*.yaml']},
-  install_requires=requirements,
+  install_requires=[
+    'PyYAML>=6.0',
+    'requests>=2.28.0',
+    'PyAudio>=0.2.11',
+    'websocket-client>=1.3.2'
+  ],
   classifiers=[
       "Programming Language :: Python :: 3.9",
       "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
