@@ -7,6 +7,7 @@ class StreamingClient:
   __websocket_url = ''
   __token_api_url = ''
   __key = ''
+  __websocket_client = None
   
   def __init__(
     self,
@@ -26,16 +27,21 @@ class StreamingClient:
     with open(config_path, 'r') as config:
       return yaml.safe_load(config)
   
-  def start_streaming_wav(self, pipeline: str, file: str, verbose: bool = False):
+  def start_streaming_wav(
+    self,
+    pipeline: str,
+    file: str,
+    verbose: bool = False):
+    
     token = self.__generate_token(pipeline)
-    websocket_client = Client({
+    self.__websocket_client = Client({
       'websocket_url': self.__websocket_url,
       'input_wav': file,
       'verbose': verbose
     })
     
-    websocket_client.init_websocket(token)
-    websocket_client.run()
+    self.__websocket_client.init_websocket(token)
+    self.__websocket_client.run()
   
   def __generate_token(self, pipeline: str):
     body = {
@@ -51,16 +57,8 @@ class StreamingClient:
         exit(1)
     return token
   
-
-def stream_file(key: str, pipeline: str, input_wav: str, verbose: bool = False, config_path: str = None):
-  """
-  ASR streaming to transcribe the voice to text
-  
-  Args:
-      key (str): the key applied in dev-console
-      config_path (str): assign API URL for testing
-  Returns:
-      None
-  """
-  asr_client = StreamingClient(key, config_path)
-  asr_client.start_streaming_wav(pipeline, input_wav, verbose)
+  def setHandler(self, on_processing_sentence = None, on_final_sentence = None):
+    if on_processing_sentence:
+      self.__websocket_client.on_processing_sentence = on_processing_sentence
+    if on_final_sentence:
+      self.__websocket_client.on_final_sentence = on_final_sentence
