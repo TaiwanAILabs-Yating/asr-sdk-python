@@ -31,6 +31,8 @@ class StreamingClient:
     self,
     pipeline: str,
     file: str,
+    on_processing_sentence = None,
+    on_final_sentence = None,
     verbose: bool = False):
     
     token = self.__generate_token(pipeline)
@@ -39,6 +41,11 @@ class StreamingClient:
       'input_wav': file,
       'verbose': verbose
     })
+    
+    if on_processing_sentence:
+      self.__websocket_client.on_processing_sentence = on_processing_sentence
+    if on_final_sentence:
+      self.__websocket_client.on_final_sentence = on_final_sentence
     
     self.__websocket_client.init_websocket(token)
     self.__websocket_client.run()
@@ -57,8 +64,3 @@ class StreamingClient:
         exit(1)
     return token
   
-  def setHandler(self, on_processing_sentence = None, on_final_sentence = None):
-    if on_processing_sentence:
-      self.__websocket_client.on_processing_sentence = on_processing_sentence
-    if on_final_sentence:
-      self.__websocket_client.on_final_sentence = on_final_sentence
