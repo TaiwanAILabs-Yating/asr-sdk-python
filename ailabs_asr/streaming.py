@@ -1,7 +1,6 @@
 import yaml
 import os
 import requests
-import websocket
 from .clients.WebSocketClient import Client
 
 class StreamingClient:
@@ -30,19 +29,13 @@ class StreamingClient:
   def start_streaming_wav(self, pipeline: str, file: str, verbose: bool = False):
     token = self.__generate_token(pipeline)
     websocket_client = Client({
+      'websocket_url': self.__websocket_url,
       'input_wav': file,
       'verbose': verbose
     })
     
-    websocket_client.ws = websocket.WebSocketApp(
-      f'{self.__websocket_url}?token={token}',
-      on_message=websocket_client.on_message,
-      on_error=websocket_client.on_error,
-      on_close=websocket_client.on_close,
-      on_open=websocket_client.on_open
-    )
-    
-    websocket_client.ws.run_forever()
+    websocket_client.init_websocket(token)
+    websocket_client.run()
   
   def __generate_token(self, pipeline: str):
     body = {
