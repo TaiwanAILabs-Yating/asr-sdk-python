@@ -3,6 +3,7 @@ import wave
 from pyaudio import PyAudio, paComplete, paContinue, paInt16
 import json
 import websocket
+from .ASRResultHandleStrategy import DefaultASRResultHandleStrategy
 
 class WavStreamer():
   __wave_file = None
@@ -16,6 +17,15 @@ class WavStreamer():
   def start(self):
     self.__stream.start_stream()
     print("### start stream ###")
+    
+  def close(self):
+    if self.__stream:
+      self.__stream.stop_stream()
+      self.__stream.close()
+    if self.__pa:
+      self.__pa.terminate()
+    if self.__wave_file:
+      self.__wave_file.close()
     
   def __create_stream(self):
     pa = self.__pa
@@ -44,18 +54,16 @@ class WavStreamer():
       return (data, paComplete)
     return (data, paContinue)
   
-  
-  
-
 class AbstractClient(ABC):
+  on_processing_sentence = None
+  on_final_sentence = None
+  
   def __init__(self, args):
     self.args = args
     self.websocket_url = self.args['websocket_url']
-    self.streamer = None
-    self.pa = None
-    self.stream = None
-    self.wave_file = None
+    self.__streamer = None
     self._ws = None
+    self.__default_asr_result_handler = DefaultASRResultHandleStrategy()
 
   @property
   def ws(self):
@@ -88,24 +96,20 @@ class AbstractClient(ABC):
   def _on_error(self, ws, error):
     print(error)
 
-  def _on_close(self, ws):
-    if self.stream:
-      self.stream.stop_stream()
-      self.stream.close()
-    if self.pa:
-      self.pa.terminate()
-    if self.wave_file:
-      self.wave_file.close()
+  def _on_close(self, ws, close_status_code, close_msg):
+    if self.__streamer:
+      self.__streamer.close()
     print("### closed ###")
+    print(f'Websocket closed[{close_status_code}]: {close_msg}')
 
   def _on_open(self, ws):
     if 'audio_url' not in self.args:
-      self.streamer = WavStreamer(self.ws, self.args['input_wav'])
+      self.__streamer = WavStreamer(self.ws, self.args['input_wav'])
       if 'j2' not in self.args:
-        self.streamer.start()
+        self.__streamer.start()
     print("### opened ###")
 
-  def lang_switch(self, lang_code):
+  def _lang_switch(self, lang_code):
     print(f'lang switch: {lang_code}')
     data = {
       'pipe': {
@@ -115,3 +119,15 @@ class AbstractClient(ABC):
       } 
     }
     self.ws.send(json.dumps(data))
+
+  def _handle_asr_result(self, message):
+    if 'asr_final' in message['pipe']:
+      if self.on_final_sentence:
+        self.on_final_sentence(message)
+      else:
+        self.__default_asr_result_handler.on_final_sentence(message)
+    else:
+      if self.on_processing_sentence:
+        self.on_processing_sentence(message)
+      else:
+        self.__default_asr_result_handler.on_processing_sentence(message)
