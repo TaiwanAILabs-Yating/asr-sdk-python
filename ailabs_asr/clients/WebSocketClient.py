@@ -2,10 +2,10 @@ from .AbstractWebsocketClient import AbstractClient
 import json
 
 class Client(AbstractClient):
-  def on_message(self, ws, message):
+  def _on_message(self, ws, message):
     msg = json.loads(message)
     if 'pipe' in msg:
-      if 'verbose' in self.args:
+      if 'verbose' in self.args and self.args['verbose'] == True:
         print(msg)
       elif 'asr_final' in msg['pipe']:
         start_time = float(msg['pipe']['asr_begin_time'])
