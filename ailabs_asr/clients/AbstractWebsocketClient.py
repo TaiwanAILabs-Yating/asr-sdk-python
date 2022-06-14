@@ -7,6 +7,7 @@ from .ASRResultHandleStrategy import DefaultASRResultHandleStrategy
 
 class WavStreamer():
   __wave_file = None
+  __ws: websocket.WebSocketApp = None
   
   def __init__(self, ws, input_wav: str = None) -> None:
     self.__ws = ws
@@ -34,13 +35,13 @@ class WavStreamer():
       return pa.open(format=paInt16, channels=1, rate=16000, output=True,
                       stream_callback=self.__cb_wav)
     else:
+      p = self.__pa
+      print(f'Using Input Device id 0 - {p.get_device_info_by_host_api_device_index(0, 0).get("name")}')
       return pa.open(format=paInt16, channels=1, rate=16000, input=True,
-                      stream_callback=self.__cb)
+                      stream_callback=self.__cb, input_device_index=0)
       
   def __cb(self, in_data, frame_count, time_info, status_flags):
     self.__ws.send(in_data, opcode=0x2)
-    if in_data:
-        print(in_data)
     return (in_data, paContinue)
 
   def __cb_wav(self, in_data, frame_count, time_info, status_flags):

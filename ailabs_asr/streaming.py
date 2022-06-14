@@ -30,7 +30,7 @@ class StreamingClient:
   def start_streaming_wav(
     self,
     pipeline: str,
-    file: str,
+    file: str = None,
     on_processing_sentence = None,
     on_final_sentence = None,
     verbose: bool = False):
