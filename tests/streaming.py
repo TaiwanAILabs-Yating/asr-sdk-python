@@ -5,16 +5,26 @@ sys.path.append(str(path_root))
 
 from ailabs_asr.streaming import StreamingClient
 
+import pyaudio
+
 
 def on_processing_sentence(message):
-  print(f'hello: {message["pipe"]["asr_sentence"]}')
+  print(f'hello: {message["asr_sentence"]}')
 
 def on_final_sentence(message):
-  print(f'world: {message["pipe"]["asr_sentence"]}')
+  print(f'world: {message["asr_sentence"]}')
 
-asr_client = StreamingClient('9c5542d34a59f87f45659ab33d5ccbb9bdaec68d')
+# check input device index
+# p = pyaudio.PyAudio()
+# info = p.get_host_api_info_by_index(0)
+# numdevices = info.get('deviceCount')
+
+# for i in range(0, numdevices):
+#   if (p.get_device_info_by_host_api_device_index(0, i).get('maxInputChannels')) > 0:
+#     print("Input Device id ", i, " - ", p.get_device_info_by_host_api_device_index(0, i).get('name'))
+
+asr_client = StreamingClient('api-key-applied-from-devconsole')
 asr_client.start_streaming_wav(
-  pipeline='asr-stream-general',
-  file='unorder-stream.wav',
-  on_processing_sentence=on_processing_sentence,
-  on_final_sentence=on_final_sentence)
+  pipeline='asr-zh-en-std',
+  # verbose=True,
+  file='voice.wav')
