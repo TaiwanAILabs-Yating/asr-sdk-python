@@ -7,8 +7,9 @@ class Client(AbstractClient):
     if 'pipe' in msg:
       if 'verbose' in self.args and self.args['verbose'] == True:
         print(msg)
-      elif 'asr_sentence' in msg['pipe']:
-        self._handle_asr_result(msg)
+      
+      if 'asr_sentence' in msg['pipe']:
+        self._handle_asr_result(msg['pipe'])
         
       if 'asr_eof' in msg['pipe'] and msg['pipe']['asr_eof']:
         if 'input_wav' in self.args:

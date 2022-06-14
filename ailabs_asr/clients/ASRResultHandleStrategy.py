@@ -13,14 +13,14 @@ class ASRResultHandleStrategy(ABC):
   
 class DefaultASRResultHandleStrategy(ASRResultHandleStrategy):
   def on_processing_sentence(self, message):
-    print(f'chunk: {message["pipe"]["asr_sentence"]}')
+    print(f'segment: {message["asr_sentence"]}')
     
   def on_final_sentence(self, message):
-    start_time = float(message['pipe']['asr_begin_time'])
-    end_time = float(message['pipe']['asr_end_time'])
-    if ('translated_asr_sentence' in message['pipe']):
+    start_time = float(message['asr_begin_time'])
+    end_time = float(message['asr_end_time'])
+    if ('translated_asr_sentence' in message):
       print(f'[{start_time:.2f} s - {end_time:.2f} s]',
-        f'{message["pipe"]["translated_asr_sentence"]}')
+        f'{message["translated_asr_sentence"]}')
       
     print(f'[{start_time:.2f} s - {end_time:.2f} s]',
-      f'{message["pipe"]["asr_sentence"]}')
+      f'{message["asr_sentence"]}')

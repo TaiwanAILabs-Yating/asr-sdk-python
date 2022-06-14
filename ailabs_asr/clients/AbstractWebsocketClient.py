@@ -122,7 +122,7 @@ class AbstractClient(ABC):
     self.ws.send(json.dumps(data))
 
   def _handle_asr_result(self, message):
-    if 'asr_final' in message['pipe']:
+    if 'asr_final' in message:
       if self.on_final_sentence:
         self.on_final_sentence(message)
       else:
