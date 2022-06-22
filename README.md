@@ -94,3 +94,9 @@ There are 2 kinds of recognized result:
   "text_segmented": "完整的 範例句子"
 }
 ```
+## limitation
+1. Audio data format: 16kHz, mono, 16 bits per sample, PCM
+2. Sample rate: 16K
+3. Sample rate per sec: 16000 x 1 x 16/8 = 32000 bytes ~= 32 Kbytes
+4. Each chunk size: 2000 bytes,  1/16 secs
+
