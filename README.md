@@ -94,3 +94,17 @@ There are 2 kinds of recognized result:
   "text_segmented": "完整的 範例句子"
 }
 ```
+
+## Limitation
+
+### Audio Data
+
+:warning: Send audio data with **binary frame** with following spec:
+
+- Audio data format
+  - 16kHz, mono
+  - 16 bits **per sample**
+  - PCM
+- Sample rate per secs: 16K(16000)
+- Sample sizes per sec: 16000(samples) x 1(sec) x 16/8(2 bytes) = 32000 bytes ~= 32 KB(/sec)
+- Each chunk size: 2000 bytes, 1/16 secs
