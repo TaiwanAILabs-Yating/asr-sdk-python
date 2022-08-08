@@ -12,10 +12,12 @@ class StreamingClient:
   def __init__(
     self,
     key: str,
+    custom_model: str = None,
     config_path: str = None) -> None:
     
     config = self.__read_api_url(config_path)
     self.__key = key
+    self.__custom_model = custom_model
     self.__websocket_url = config['WebSocket']['URL']
     self.__token_api_url = config['TokenAPI']['URL']
   
@@ -54,6 +56,8 @@ class StreamingClient:
     body = {
         'pipeline': pipeline,
     }
+    if self.__custom_model != None:
+      body['options']['s3CusModelKey'] = self.__custom_model
     res = requests.post(self.__token_api_url,
                         json=body,
                         headers={'key': self.__key},
