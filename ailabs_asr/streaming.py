@@ -57,7 +57,10 @@ class StreamingClient:
         'pipeline': pipeline,
     }
     if self.__custom_model != None:
-      body['options']['s3CusModelKey'] = self.__custom_model
+      body['options'] = {
+        's3CusModelKey': self.__custom_model,
+        'lang': 'zhen'
+      }
     res = requests.post(self.__token_api_url,
                         json=body,
                         headers={'key': self.__key},
