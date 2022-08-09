@@ -5,7 +5,7 @@ with open('README.md', 'r') as readme_file:
 
 setup(
   name='ailabs-asr',
-  version='0.0.9',
+  version='0.0.10',
   author='Hendryboyz',
   author_email="Hendry.js1247@gmail.com",
   description="Package to utilize the speech to text API powered by AILabs.tw",
