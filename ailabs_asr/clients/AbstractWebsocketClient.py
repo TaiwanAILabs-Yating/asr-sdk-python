@@ -18,7 +18,14 @@ class WavStreamer():
   def start(self):
     self.__stream.start_stream()
     print("### start stream ###")
-    
+  
+  def stop(self):
+    if self.__stream:
+      self.__stream.stop_stream()
+  
+  def is_stop(self) -> bool:
+    return self.__stream.is_stopped() if self.__stream else True
+  
   def close(self):
     if self.__stream:
       self.__stream.stop_stream()
@@ -89,6 +96,14 @@ class AbstractClient(ABC):
   
   def run(self):
     self.ws.run_forever()
+  
+  def switch(self):
+    if self.__streamer == None:
+      return
+    if self.__streamer.is_stop():
+      self.__streamer.start()
+    else:
+      self.__streamer.stop()
 
   @abstractclassmethod
   def _on_message(self, ws, message):

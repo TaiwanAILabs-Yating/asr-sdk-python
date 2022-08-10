@@ -52,6 +52,10 @@ class StreamingClient:
     self.__websocket_client.init_websocket(token)
     self.__websocket_client.run()
   
+  def switch_streamer(self):
+    if self.__websocket_client:
+      self.__websocket_client.switch()
+  
   def __generate_token(self, pipeline: str):
     body = {
         'pipeline': pipeline,
