@@ -1,11 +1,12 @@
 from setuptools import setup, find_packages
+import os
 
 with open('README.md', 'r') as readme_file:
   readme = readme_file.read()
 
 setup(
   name='ailabs-asr',
-  version='0.0.11',
+  version=os.environ.get('VERSION_NUMBER'),
   author='Hendryboyz',
   author_email="Hendry.js1247@gmail.com",
   description="Package to utilize the speech to text API powered by AILabs.tw",

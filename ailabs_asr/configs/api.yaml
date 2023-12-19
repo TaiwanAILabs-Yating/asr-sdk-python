@@ -2,7 +2,7 @@ WebSocket:
   URL: wss://asr.api.yating.tw/ws/v1/
 
 RESTfulAPI:
-  URL: https://asr.api.yating.tw/v1/docs
+  URL: https://asr.api.yating.tw/v1
 
 TokenAPI:
   URL: https://asr.api.yating.tw/v1/token
