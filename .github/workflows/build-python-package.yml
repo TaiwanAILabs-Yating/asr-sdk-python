@@ -1,0 +1,38 @@
+name: Build AILabs ASR SDK package
+run-name: Build package start by ${{ github.actor }} 🚀
+on: push
+env:
+  PYTHON_VERSION: '3.9'
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    outputs:
+      PACKAGE_VERSION: ${{ steps.build_step.outputs.VERSION_NUMBER }}
+    steps:
+    - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+    - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+    - name: Check out repository code from ${{ github.repository }} - ${{ github.ref }} 
+      uses: actions/checkout@v4
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    - run: echo "🖥️ The workflow is now ready to test your code on the runner."
+    - name: List files in the repository
+      run: |
+        ls ${{ github.workspace }}
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -y portaudio19-dev
+        python -m pip install --upgrade pip
+        if [ -f requirements_dev.txt ]; then
+          pip install -r requirements_dev.txt;
+        fi
+    - name: Build package
+      id: build_step
+      run: |
+        export VERSION_NUMBER=$(grep version package.json | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]')
+        echo "Start to build package"
+        python setup.py sdist bdist_wheel
+        echo "VERSION_NUMBER=${VERSION_NUMBER}" >> "$GITHUB_OUTPUT"
+    - run: echo "🍏 This job's status is ${{ job.status }}."
