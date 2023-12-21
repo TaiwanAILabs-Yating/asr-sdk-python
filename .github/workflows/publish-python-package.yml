@@ -1,0 +1,68 @@
+name: Publish AILabs ASR SDK package
+run-name: Release package start by ${{ github.actor }} 
+on:
+  release:
+    types: [published]
+env:
+  PYTHON_VERSION: '3.9'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      PACKAGE_VERSION: ${{ steps.build_step.outputs.VERSION_NUMBER }}
+    steps:
+    - name: Check out repository code from ${{ github.repository }} - ${{ github.ref }} 
+      uses: actions/checkout@v4
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -y portaudio19-dev
+        python -m pip install --upgrade pip
+        if [ -f requirements_dev.txt ]; then
+          pip install -r requirements_dev.txt;
+        fi
+    - name: Build package
+      id: build_step
+      run: |
+        export VERSION_NUMBER=$(grep version package.json | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]')
+        echo "Start to build package"
+        python setup.py sdist bdist_wheel
+        echo "VERSION_NUMBER=${VERSION_NUMBER}" >> "$GITHUB_OUTPUT"
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: python-package-distributions
+        path: dist/**/*
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/ailabs-asr
+    permissions:
+      id-token: write 
+    steps:
+    - env:
+        PACKAGE_VERSION: ${{ needs.build.outputs.PACKAGE_VERSION }}
+      run: echo "Start to release ${{ github.repository }} version ${{ env.PACKAGE_VERSION }}  🚀"
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    - name: Download a single artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: python-package-distributions
+        path: dist/
+    - name: List package contents
+      run: |
+        ls -alR .
+    - name: Publish distribution 📦 to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
