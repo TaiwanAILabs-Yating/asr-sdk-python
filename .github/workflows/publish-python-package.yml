@@ -1,10 +1,8 @@
 name: Publish AILabs ASR SDK package
 run-name: Release package start by ${{ github.actor }} 
 on:
-  push:
-    tags:
-      - v?[0-9]+.[0-9]+.[0-9]+
-
+  release:
+    types: [published]
 env:
   PYTHON_VERSION: '3.9'
 
